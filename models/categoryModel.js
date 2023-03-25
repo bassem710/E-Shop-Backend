@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const categorySchema = new mongoose.Schema({
     name: {
         type: String,
+        trim: true,
         required: [true, 'Category required'],
         unique: [true, 'Category must be unique'],
         minLength: [3, 'Too short category name'],
