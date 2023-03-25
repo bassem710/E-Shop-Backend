@@ -14,7 +14,11 @@ const {
     deleteCategory,
 } = require('../controllers/categoryControllers');
 
+const subCategoriesRoutes = require('./subCategoryRoutes');
+
 const router = express.Router();
+
+router.use('/:categoryId/subCategories', subCategoriesRoutes);
 
 router.route('/')
     .get(getCategories)
