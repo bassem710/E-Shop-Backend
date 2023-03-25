@@ -1,5 +1,7 @@
 const Category = require('../models/categoryModel');
+
 const slugify = require('slugify');
+const ApiError = require('../utils/ApiError');
 const asyncHandler = require('express-async-handler');
 
 // @desc    Get list of categories
@@ -20,11 +22,11 @@ exports.getCategories = asyncHandler(async (req, res) => {
 // @desc    Get specific categories
 // @route   GET /api/v1/category/:id
 // @access  Public
-exports.getCategory = asyncHandler(async (req, res) => {
+exports.getCategory = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const category = await Category.findById(id);
     if(!category){
-        res.status(404).json({msg:`Category (${id}) is not found`});
+        return next(new ApiError(`Category (${id}) is not found`, 404));
     }
     res.status(200).json({data: category});
 });
@@ -41,12 +43,12 @@ exports.addCategory = asyncHandler(async (req, res) => {
 // @desc    Update specific category
 // @route   PUT /api/v1/category/:id
 // @access  Private
-exports.updateCategory = asyncHandler(async (req, res) => {
+exports.updateCategory = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const { name } = req.body;
     const category = await Category.findOneAndUpdate({_id: id}, {name, slug: slugify(name)}, {new: true});
     if(!category){
-        res.status(404).json({msg:`Category (${id}) is not found`});
+        return next(new ApiError(`Category (${id}) is not found`, 404));
     }
     res.status(200).json({data: category});
 });
@@ -54,11 +56,11 @@ exports.updateCategory = asyncHandler(async (req, res) => {
 // @desc    Delete specific category
 // @route   DELETE /api/v1/category/:id
 // @access  Private
-exports.deleteCategory = asyncHandler(async (req, res) => {
+exports.deleteCategory = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const category = await Category.findByIdAndDelete(id);
     if(!category){
-        res.status(404).json({msg:`Category (${id}) is not found`});
+        return next(new ApiError(`Category (${id}) is not found`, 404));
     }
     res.status(204).send();
 });
