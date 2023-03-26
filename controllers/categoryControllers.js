@@ -19,7 +19,7 @@ exports.getCategories = asyncHandler(async (req, res) => {
     })
 });
 
-// @desc    Get specific categories
+// @desc    Get specific category
 // @route   GET /api/v1/category/:id
 // @access  Public
 exports.getCategory = asyncHandler(async (req, res, next) => {
