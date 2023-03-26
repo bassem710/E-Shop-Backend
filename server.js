@@ -8,6 +8,7 @@ const globalError = require('./middlewares/errorMiddleware');
 
 const categoryRoutes = require('./routes/categoryRoutes');
 const subCategoryRoutes = require('./routes/subCategoryRoutes');
+const brandRoutes = require('./routes/brandRoutes');
 
 const PORT = process.env.PORT || 8000
 dotenv.config();
@@ -29,6 +30,7 @@ if(process.env.NODE_ENV === "development"){
 // Routes
 app.use('/api/v1/category', categoryRoutes);
 app.use('/api/v1/subCategory', subCategoryRoutes);
+app.use('/api/v1/brand', brandRoutes);
 
 app.all('*', (req, res ,next) => {
     next(new ApiError(`This Route (${req.originalUrl}) is not found`, 400))
