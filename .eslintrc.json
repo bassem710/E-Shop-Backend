@@ -13,6 +13,7 @@
         "no-return-await": "off",
         "no-underscore-dangle": "off",
         "class-methods-use-this": "off",
+        "import/no-extraneous-dependencies": "off",
         "no-undef": "error",
         // "arrow-body-style": "off",
         "prefer-destructuring": ["error", { "object": true, "array": false }],

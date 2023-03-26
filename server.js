@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
+require('colors');
 
 const dbConnection = require('./config/db');
 const ApiError = require('./utils/ApiError');
@@ -25,7 +26,7 @@ app.use(express.json());
 
 if(process.env.NODE_ENV === "development"){
     app.use(morgan('dev'));
-    console.log(`Mode: ${process.env.NODE_ENV}`);
+    console.log(`Mode: ${process.env.NODE_ENV}`.blue.bold);
 }
 
 // Routes
@@ -42,14 +43,14 @@ app.all('*', (req, res ,next) => {
 app.use(globalError);
 
 const server = app.listen(PORT, () => {
-    console.log(`Running on port ${PORT}`)
+    console.log(`Running on port ${PORT}` .blue.bold);
 });
 
 // Handle rejection outside express app
 process.on('unhandledRejection', (err) => {
     console.error(`Unhandled Rejection Error: ${err.name} | ${err.message}`);
     server.close( () => {
-        console.error(`Shutting down...`);
+        console.error(`Shutting down...`.red.inverse);
         process.exit(1);
     });
 })
