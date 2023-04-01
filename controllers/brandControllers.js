@@ -32,23 +32,12 @@ exports.getBrands = asyncHandler(async (req, res) => {
 // @desc    Get specific brand
 // @route   GET /api/v1/brand/:id
 // @access  Public
-exports.getBrand = asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
-    const brand = await Brand.findById(id);
-    if(!brand){
-        return next(new ApiError(`Brand (${id}) is not found`, 404));
-    }
-    res.status(200).json({data: brand});
-});
+exports.getBrand = handlers.getOne(Brand);
 
 // @desc    Create brand
 // @route   POST /api/v1/brand
 // @access  Private
-exports.addBrand = asyncHandler(async (req, res) => {
-    const { name } = req.body;
-    const brand = await Brand.create({name, slug: slugify(name)});
-    res.status(201).json({data: brand});
-});
+exports.addBrand = handlers.createOne(Brand);
 
 // @desc    Update specific brand
 // @route   PUT /api/v1/brand/:id

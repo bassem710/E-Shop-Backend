@@ -32,26 +32,12 @@ exports.getProducts = asyncHandler(async (req, res) => {
 // @desc    Get specific product
 // @route   GET /api/v1/product/:id
 // @access  Public
-exports.getProduct = asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
-    const product = await Product.findById(id).populate({
-        path: "category",
-        select: "name -_id",
-    });
-    if (!product) {
-        return next(new ApiError(`Product (${id}) is not found`, 404));
-    }
-    res.status(200).json({ data: product });
-});
+exports.getProduct = handlers.getOne(Product);
 
 // @desc    Create product
 // @route   POST /api/v1/product
 // @access  Private
-exports.addProduct = asyncHandler(async (req, res) => {
-    req.body.slug = slugify(req.body.title);
-    const product = await Product.create(req.body);
-    res.status(201).json({ data: product });
-});
+exports.addProduct = handlers.createOne(Product);
 
 // @desc    Update specific product
 // @route   PUT /api/v1/product/:id

@@ -39,15 +39,7 @@ exports.getSubCategories = asyncHandler(async (req, res) => {
 // @desc    Get a specific subCategory
 // @route   GET /api/v1/subCategory/:id
 // @access  Public
-exports.getSubCategory = asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
-    const subCategory = await SubCategory
-        .findById(id);
-    if(!subCategory){
-        return next(new ApiError(`subCategory (${id}) is not found`, 404));
-    }
-    res.status(200).json({data: subCategory});
-});
+exports.getSubCategory = handlers.getOne(SubCategory);
 
 // @desc    Create subCategory
 // @route   POST /api/v1/subCategory
@@ -57,16 +49,7 @@ exports.setCategoryIdToBody = (req, res, next) => {
     next();
 }
 
-exports.addSubCategory = asyncHandler(async (req, res) => {
-    const { name, category } = req.body;
-
-    const subCategory = await SubCategory.create({
-        name,
-        slug: slugify(name),
-        category
-    });
-    res.status(201).json({data: subCategory});
-});
+exports.addSubCategory = handlers.createOne(SubCategory);
 
 // @desc    Update a specific subCategory
 // @route   PUT /api/v1/subCategory/:id

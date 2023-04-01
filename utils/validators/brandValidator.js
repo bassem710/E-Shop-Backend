@@ -15,6 +15,10 @@ exports.createBrandValidator = [
         .withMessage("Too short brand name")
         .isLength({ max: 32 })
         .withMessage("Too long brand name"),
+    body('name').custom((val,{req}) => {
+        req.body.slug = slugify(val);
+        return true;
+    }),
     validatorMiddleware,
 ];
 
