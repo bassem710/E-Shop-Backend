@@ -1,7 +1,3 @@
-const slugify = require("slugify");
-const asyncHandler = require("express-async-handler");
-const ApiError = require("../utils/ApiError");
-const ApiFeatures = require("../utils/ApiFeatures");
 const handlers = require('./handlers');
 
 const Product = require("../models/productModel");
@@ -9,25 +5,7 @@ const Product = require("../models/productModel");
 // @desc    Get list of products
 // @route   GET /api/v1/product
 // @access  Public
-exports.getProducts = asyncHandler(async (req, res) => {
-    const docCount = await Product.countDocuments();
-    const apiFeatures = new ApiFeatures(Product.find(), req.query)
-        .pagination(docCount)
-        .filter()
-        .search("Product")
-        .limitFields()
-        .sort()
-        .mongooseQueryExec();
-
-    const { mongooseQuery, paginationResult } = apiFeatures;
-    const products = await mongooseQuery;
-
-    res.status(200).json({
-        results: products.length,
-        paginationResult,
-        data: products,
-    });
-});
+exports.getProducts = handlers.getAll(Product, "Product");
 
 // @desc    Get specific product
 // @route   GET /api/v1/product/:id
