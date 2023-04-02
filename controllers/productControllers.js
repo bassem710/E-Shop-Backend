@@ -23,16 +23,19 @@ exports.resizeProductImgs = asyncHandler(async (req, res, next) => {
     }
     if(req.files.images){
         req.body.images = [];
-        req.files.images.map( async (img, ind) => {
-            const imgName = `product-${uuidv4()}-${Date.now()}-${ind+1}.jpeg`;
-            await sharp(img.buffer)
-                .resize(2000, 1333)
-                .toFormat("jpeg")
-                .jpeg({quality: 90})
-                .toFile(`uploads/products/${imgName}`);
-            req.body.images.push(imgName);
-        })
+        await Promise.all(
+            req.files.images.map( async (img, ind) => {
+                const imgName = `product-${uuidv4()}-${Date.now()}-${ind+1}.jpeg`;
+                await sharp(img.buffer)
+                    .resize(2000, 1333)
+                    .toFormat("jpeg")
+                    .jpeg({quality: 90})
+                    .toFile(`uploads/products/${imgName}`);
+                req.body.images.push(imgName);
+            })
+        );
     }
+    next();
 });
 
 // @desc    Get list of products
