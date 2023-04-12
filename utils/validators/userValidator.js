@@ -87,7 +87,7 @@ exports.changeUserPasswordValidator = [
         .notEmpty().withMessage("Password is required")
         .custom( async (password, {req}) => {
             // Verify old password
-            const user = await User.findById(req.params.id);
+            const user = await User.findById(req.user._id?req.user._id:req.params.id);
             if(!user){
                 throw new Error("User doesn't exist");
             }
@@ -95,6 +95,7 @@ exports.changeUserPasswordValidator = [
             if(!passwordsMatch) throw new Error("Incorrect old password");
             // Confirm new password
             if(password !== req.body.confirmPassword) throw new Error("Passwords do not match");
+            if(password === req.body.currentPassword) throw new Error("This already your current password");
             return true;
         }),
         validatorMiddleware,

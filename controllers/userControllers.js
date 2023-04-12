@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
 const User = require('../models/userModel');
 const handlers = require("./handlers");
 const ApiError = require('../utils/ApiError');
+const generateToken = require('../utils/generateToken');
 const { uploadSingleImg } = require('../middlewares/uploadImageMiddleware');
 
 exports.uploadUserImg = uploadSingleImg("profileImg");
@@ -75,3 +76,28 @@ exports.changeUserPassword = asyncHandler(async (req, res, next) => {
 // @route   DELETE /api/v1/user/:id
 // @access  Private
 exports.deleteUser = handlers.deleteOne(User);
+
+// @desc    Get logged user data
+// @route   GET /api/v1/user/getMe
+// @access  Private
+exports.getLoggedUserData = asyncHandler(async (req, res, next) => {
+    req.params.id = req.user._id;
+    next();
+});
+
+// @desc    Update logged user password
+// @route   PUT /api/v1/user/updatePassword
+// @access  Private
+exports.updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
+    req.params.id = req.user._id;
+    const updated = await User.findByIdAndUpdate(req.user._id, 
+        {
+            password: await bcrypt.hash(req.body.password, 12),
+            passwordChangedAt: Date.now(),
+        }, {new: true});
+        if(!updated){
+            return next(new ApiError(`Document with this id is not found`, 404));
+        }
+        const token = generateToken({userId: updated._id});
+        res.status(200).json({data: updated, token});
+});

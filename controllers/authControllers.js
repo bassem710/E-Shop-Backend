@@ -6,13 +6,7 @@ const crypto = require("crypto");
 const User = require('../models/userModel');
 const ApiError = require('../utils/ApiError');
 const sendEmail = require('../utils/sendEmail');
-
-const generateToken = (payload) =>
-    jwt.sign(
-        payload, 
-        process.env.JWT_SECRET_KEY, 
-        {expiresIn: process.env.JWT_EXP_IN}
-        ); 
+const generateToken = require('../utils/generateToken');
 
 // @desc    Sign Up
 // @route   POST /api/v1/auth/signup
