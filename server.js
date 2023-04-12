@@ -14,6 +14,7 @@ const subCategoryRoutes = require('./routes/subCategoryRoutes');
 const brandRoutes = require('./routes/brandRoutes');
 const productRoutes = require('./routes/productRoutes');
 const userRoutes = require('./routes/userRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 const PORT = process.env.PORT || 8000
 dotenv.config();
@@ -39,6 +40,7 @@ app.use('/api/v1/subCategory', subCategoryRoutes);
 app.use('/api/v1/brand', brandRoutes);
 app.use('/api/v1/product', productRoutes);
 app.use('/api/v1/user', userRoutes);
+app.use('/api/v1/auth', authRoutes);
 
 app.all('*', (req, res ,next) => {
     next(new ApiError(`This Route (${req.originalUrl}) is not found`, 400))
