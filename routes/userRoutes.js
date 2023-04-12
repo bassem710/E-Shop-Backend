@@ -4,7 +4,8 @@ const {
     createUserValidator, 
     updateUserValidator, 
     changeUserPasswordValidator,
-    deleteUserValidator, 
+    deleteUserValidator,
+    updateLoggedUserValidator
 } = require('../utils/validators/userValidator');
 
 const {
@@ -17,19 +18,24 @@ const {
     changeUserPassword,
     deleteUser,
     getLoggedUserData,
-    updateLoggedUserPassword
+    updateLoggedUserPassword,
+    updateLoggedUserData,
 } = require('../controllers/userControllers');
 
 const {protect, allowedTo} = require('../controllers/authControllers');
 
 const router = express.Router();
 
-// Logged user routes
-router.get("/getMe", protect, getLoggedUserData, getUser);
-router.put("/changeMyPassword", protect, changeUserPasswordValidator, updateLoggedUserPassword);
+// Protect
+router.use(protect);
 
-// Protect/admin
-router.use(protect, allowedTo('admin'));
+// Logged user routes
+router.get("/getMe", getLoggedUserData, getUser);
+router.put("/changeMyPassword", changeUserPasswordValidator, updateLoggedUserPassword);
+router.put("/updateMe", updateLoggedUserValidator, updateLoggedUserData);
+
+// Allow routes to admin only
+router.use(allowedTo('admin'));
 
 // Admin routes
 router.put("/changePassword/:id", changeUserPasswordValidator, changeUserPassword);
