@@ -17,15 +17,17 @@ const {
     createFilterObj,
 } = require('../controllers/subCategoryControllers');
 
+const {protect, allowedTo} = require('../controllers/authControllers');
+
 const router = express.Router({mergeParams: true});
 
 router.route('/')
     .get(createFilterObj, getSubCategories)
-    .post(setCategoryIdToBody, createSubCategoryValidator, addSubCategory);
+    .post(protect, allowedTo('admin', 'manager'), setCategoryIdToBody, createSubCategoryValidator, addSubCategory);
 
 router.route('/:id')
     .get(getSubCategoryValidator, getSubCategory)
-    .put(updateSubCategoryValidator, updateSubCategory)
-    .delete(deleteSubCategoryValidator, deleteSubCategory)
+    .put(protect, allowedTo('admin', 'manager'), updateSubCategoryValidator, updateSubCategory)
+    .delete(protect, allowedTo('admin', 'manager'), deleteSubCategoryValidator, deleteSubCategory)
 
 module.exports = router;

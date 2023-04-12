@@ -16,15 +16,17 @@ const {
     deleteBrand,
 } = require('../controllers/brandControllers');
 
+const {protect, allowedTo} = require('../controllers/authControllers');
+
 const router = express.Router();
 
 router.route('/')
     .get(getBrands)
-    .post(uploadBrandImg, resizeImg, createBrandValidator, addBrand);
+    .post(protect, allowedTo('admin', 'manager'), uploadBrandImg, resizeImg, createBrandValidator, addBrand);
 
 router.route('/:id')
     .get(getBrandValidator, getBrand)
-    .put(uploadBrandImg, resizeImg, updateBrandValidator, updateBrand)
-    .delete(deleteBrandValidator, deleteBrand);
+    .put(protect, allowedTo('admin', 'manager'), uploadBrandImg, resizeImg, updateBrandValidator, updateBrand)
+    .delete(protect, allowedTo('admin', 'manager'), deleteBrandValidator, deleteBrand);
 
     module.exports = router;

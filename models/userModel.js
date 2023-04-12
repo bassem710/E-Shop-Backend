@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema({
     passwordChangedAt: Date,
     role: {
         type: String,
-        enum: ['user', 'admin'],
+        enum: ['user', 'admin', 'manager'],
         default: 'user'
     },
     active:{
