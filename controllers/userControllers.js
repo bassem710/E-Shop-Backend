@@ -62,7 +62,8 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
 exports.changeUserPassword = asyncHandler(async (req, res, next) => {
     const updated = await User.findByIdAndUpdate(req.params.id, 
     {
-        password: await bcrypt.hash(req.body.password, 12) 
+        password: await bcrypt.hash(req.body.password, 12),
+        passwordChangedAt: Date.now(),
     }, {new: true});
     if(!updated){
         return next(new ApiError(`Document with this id is not found`, 404));
