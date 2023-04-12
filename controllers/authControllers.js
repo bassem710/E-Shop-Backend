@@ -1,9 +1,11 @@
 const asyncHandler = require('express-async-handler');
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 
 const User = require('../models/userModel');
 const ApiError = require('../utils/ApiError');
+const sendEmail = require('../utils/sendEmail');
 
 const generateToken = (payload) =>
     jwt.sign(
@@ -42,6 +44,103 @@ exports.login = asyncHandler( async (req, res, next) => {
     const token = generateToken({userId: user._id});
     // response
     res.status(200).json({data: user, token});
+});
+
+// @desc    Forgot Password
+// @route   POST /api/v1/auth/forgotPassword
+// @access  Public
+exports.forgotPassword = asyncHandler( async (req, res, next) => {
+    // Check User
+    const user = await User.findOne({email: req.body.email});
+    if(!user) {
+        return next(new ApiError(`User ${req.body.email} not found`, 404));
+    }
+    // Random 6 digits
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const hashedResetCode = crypto
+        .createHash('sha256')
+        .update(resetCode)
+        .digest('hex');
+    // Save hashed reset code in DB
+    user.passwordResetCode = hashedResetCode;
+    user.passwordResetCodeExp = Date.now() + 10 * 60 * 1000;
+    user.passwordResetCodeVerified = false;
+    await user.save();
+    // Send email
+    const msg = `Hi ${user.name},\nwe received a request to reset the password on your E-Commerce Account.\n${resetCode}\nEnter this code to complete the reset.\nThanks for helping us keep your accoun secure\n`;
+    try{
+        await sendEmail({
+            email: user.email,
+            subject: "Your e-commerce account reset code",
+            message: msg,
+        });
+    } catch(err) {
+        user.passwordResetCode = undefined;
+        user.passwordResetCodeExp = undefined;
+        user.passwordResetCodeVerified = undefined;
+        await user.save();
+        return next(new ApiError("Cannot send reset code email", 500));
+    }
+    // Response
+    res.status(200).json({
+        status: "success",
+        message: "Reset code sent to email"
+    });
+});
+
+// @desc    Verify reset code
+// @route   POST /api/v1/auth/verifyResetCode
+// @access  Public
+exports.verifyResetCode = asyncHandler( async (req, res, next) => {
+    const hashedResetCode = crypto
+        .createHash('sha256')
+        .update(req.body.resetCode)
+        .digest('hex');
+
+    const user = await User.findOne({
+        passwordResetCode: hashedResetCode,
+        passwordResetCodeExp: { $gt: Date.now() },
+    });
+
+    if(!user){
+        return next(new ApiError("Reset code is invalid or expired", 401));
+    }
+
+    user.passwordResetCodeVerified = true;
+    await user.save();
+
+    res.status(200).json({
+        status: "Success",
+        message: "Reset code verified successfully"
+    })
+});
+
+// @desc    Reset password
+// @route   POST /api/v1/auth/resetPassword
+// @access  Public
+exports.resetPassword = asyncHandler( async (req, res, next) => {
+    // Check user
+    const user = await User.findOne({email: req.body.email});
+    if(!user){
+        return next(new ApiError(`User ${req.body.email} does not exist`, 404));
+    }
+    // Check reset code verified field
+    if(!user.passwordResetCodeVerified){
+        return next(new ApiError(`Reset code is not verified`, 404));
+    }
+    // Update user data
+    user.password = req.body.newPassword;
+    user.passwordResetCode = undefined;
+    user.passwordResetCodeExp = undefined;
+    user.passwordResetCodeVerified = undefined;
+    await user.save();
+    // generate token
+    const token = generateToken({userId: user._id});
+    res.status(200).json({
+        status: "Success",
+        message: "Password is reseted successfully",
+        token: token
+    })
 });
 
 exports.protect = asyncHandler( async (req, res, next) => {

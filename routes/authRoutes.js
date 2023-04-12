@@ -7,16 +7,17 @@ const {
 const {
     signup,
     login,
+    forgotPassword,
+    verifyResetCode,
+    resetPassword
 } = require('../controllers/authControllers');
 
 const router = express.Router();
 
 router.route('/signup').post(signupValidator, signup);
 router.route('/login').post(loginValidator, login);
+router.route('/forgotPassword').post(forgotPassword);
+router.route('/verifyResetCode').post(verifyResetCode);
+router.route('/resetPassword').put(resetPassword);
 
-// router.route('/:id')
-//     .get(getUserValidator, getUser)
-//     .put(uploadUserImg, resizeImg, updateUserValidator, updateUser)
-//     .delete(deleteUserValidator, deleteUser);
-
-    module.exports = router;
+module.exports = router;
