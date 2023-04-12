@@ -31,7 +31,15 @@ exports.createUserValidator = [
         })),
         check("password")
             .notEmpty().withMessage("Password is required")
-            .isLength({min: 6}).withMessage("Too short password"),
+            .isLength({min: 6}).withMessage("Too short password")
+            .custom( (password, {req}) => {
+                if(password !== req.body.confirmPassword){
+                    throw new Error("Passwords don't match");
+                }
+                return true;
+            }),
+        check("confirmPassword")
+            .notEmpty().withMessage("Confirm password is required"),
         check("phone")
             .optional()
             .isMobilePhone(['ar-EG']).withMessage("Invalid phone number"),
