@@ -1,5 +1,6 @@
 const { check, body } = require("express-validator");
 const slugify = require("slugify");
+const bcrypt = require("bcrypt");
 const validatorMiddleware = require("../../middlewares/validatorMiddleware");
 
 const User = require("../../models/userModel");
@@ -61,8 +62,43 @@ exports.updateUserValidator = [
         req.body.slug = slugify(val);
         return true;
     }),
+    check("email")
+        .notEmpty().withMessage("Email is required")
+        .isEmail().withMessage("Invalid email address")
+        .custom( (val) => User.findOne({email: val}).then( user => {
+            if(user){
+                return Promise.reject(new Error("Email already exists"));
+            }
+        })),
+        check("phone")
+            .optional()
+            .isMobilePhone(['ar-EG']).withMessage("Invalid phone number"),
+        check("profileImg").optional(),
+        check("role").optional(),
     validatorMiddleware,
-]
+];
+
+exports.changeUserPasswordValidator = [
+    body("currentPassword")
+        .notEmpty().withMessage("Current password is required"),
+    body("confirmPassword")
+        .notEmpty().withMessage("Confirm password is required"),
+    body("password")
+        .notEmpty().withMessage("Password is required")
+        .custom( async (password, {req}) => {
+            // Verify old password
+            const user = await User.findById(req.params.id);
+            if(!user){
+                throw new Error("User doesn't exist");
+            }
+            const passwordsMatch = await bcrypt.compare(req.body.currentPassword, user.password);
+            if(!passwordsMatch) throw new Error("Incorrect old password");
+            // Confirm new password
+            if(password !== req.body.confirmPassword) throw new Error("Passwords do not match");
+            return true;
+        }),
+        validatorMiddleware,
+];
 
 exports.deleteUserValidator = [
     check("id").isMongoId().withMessage("Invalid user id"),
