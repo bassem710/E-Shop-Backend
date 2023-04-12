@@ -20,6 +20,7 @@ const {
     getLoggedUserData,
     updateLoggedUserPassword,
     updateLoggedUserData,
+    deleteLoggedUser,
 } = require('../controllers/userControllers');
 
 const {protect, allowedTo} = require('../controllers/authControllers');
@@ -33,6 +34,7 @@ router.use(protect);
 router.get("/getMe", getLoggedUserData, getUser);
 router.put("/changeMyPassword", changeUserPasswordValidator, updateLoggedUserPassword);
 router.put("/updateMe", updateLoggedUserValidator, updateLoggedUserData);
+router.delete("/deleteMe", deleteLoggedUser);
 
 // Allow routes to admin only
 router.use(allowedTo('admin'));

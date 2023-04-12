@@ -115,4 +115,15 @@ exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
         {new: true}
         );
     res.status(200).json({data: updatedUser});
+}); 
+
+// @desc    Deactivate logged user
+// @route   DELETE /api/v1/user/deleteMe
+// @access  Private
+exports.deleteLoggedUser = asyncHandler(async (req, res, next) => {
+    const deactivatedUser = await User.findByIdAndUpdate(req.user._id, {active: false}, {new: true});
+    if(deactivatedUser.active){
+        return next(new ApiError("Could not deactivate your account"));
+    }
+    res.status(204).json({status: "Success", message: "Account deactivated sucessfully"});
 });
