@@ -27,10 +27,14 @@ exports.createOne = model =>
         res.status(201).json({data: newDocument});
     });
 
-exports.getOne = model =>
+exports.getOne = (model, populationOpt) =>
     asyncHandler(async (req, res, next) => {
         const { id } = req.params;
-        const doc = await model.findById(id);
+        let query = model.findById(id);
+        if(populationOpt){
+            query = query.populate(populationOpt);
+        }
+        const doc = await query;
         if(!doc){
             return next(new ApiError(`Document with this id is not found`, 404));
         }
