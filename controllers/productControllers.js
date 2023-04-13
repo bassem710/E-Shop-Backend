@@ -46,7 +46,7 @@ exports.getProducts = handlers.getAll(Product, "Product");
 // @desc    Get specific product
 // @route   GET /api/v1/product/:id
 // @access  Public
-exports.getProduct = handlers.getOne(Product);
+exports.getProduct = handlers.getOne(Product, "reviews");
 
 // @desc    Create product
 // @route   POST /api/v1/product
