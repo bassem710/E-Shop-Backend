@@ -18,9 +18,12 @@ const {
 } = require('../controllers/productControllers');
 
 const {protect, allowedTo} = require('../controllers/authControllers');
+const reviewRoutes = require('./reviewRoutes');
 
 const router = express.Router();
 
+// Nested Routes
+router.use('/:productId/reviews', reviewRoutes);
 
 router.route('/')
     .get(getProducts)
