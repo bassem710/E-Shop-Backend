@@ -37,7 +37,7 @@ exports.updateReviewValidator = [
             if(!review){
                 return Promise.reject(new Error("Review does not exist"));
             }
-            if(review.user.toString() !== req.user._id.toString()){
+            if(review.user._id.toString() !== req.user._id.toString()){
                 return Promise.reject(new Error("Not authorized to update this review"));
             }
         }),

@@ -5,11 +5,11 @@ const ApiFeatures = require('../utils/ApiFeatures');
 exports.deleteOne = model => 
     asyncHandler(async (req, res, next) => {
         const { id } = req.params;
-        const document = await model.findByIdAndDelete(id);
+        const document = await model.findById(id);
         if(!document){
             return next(new ApiError(`Document with this id is not found`, 404));
         }
-        document.remove(); //Trigger "remove" event to update product ratingQty & ratingAvg calculation
+        await document.deleteOne();
         res.status(204).send();
     });
 
