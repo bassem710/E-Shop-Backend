@@ -9,6 +9,7 @@ exports.deleteOne = model =>
         if(!document){
             return next(new ApiError(`Document with this id is not found`, 404));
         }
+        document.remove(); //Trigger "remove" event to update product ratingQty & ratingAvg calculation
         res.status(204).send();
     });
 
@@ -18,6 +19,7 @@ exports.updateOne = model =>
         if(!updated){
             return next(new ApiError(`Document with this id is not found`, 404));
         }
+        updated.save(); //Trigger "save" event to update product ratingQty & ratingAvg calculation
         res.status(200).json({data: updated});
     });
 
