@@ -41,6 +41,15 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: 'Product',
     }],
+    addresses: [
+        {
+            id: mongoose.Schema.Types.ObjectId,
+            alias: String,
+            details: String,
+            phone: String,
+            city: String
+        }
+    ]
 }, {timestamps: true});
 
 userSchema.pre('save', async function (next) {

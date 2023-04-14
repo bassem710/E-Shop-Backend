@@ -17,6 +17,7 @@ const userRoutes = require('./routes/userRoutes');
 const authRoutes = require('./routes/authRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const wishlistRoutes = require('./routes/wishlistRoutes');
+const addressRoutes = require('./routes/addressRoutes');
 
 const PORT = process.env.PORT || 8000
 dotenv.config();
@@ -45,6 +46,7 @@ app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/review', reviewRoutes);
 app.use('/api/v1/wishlist', wishlistRoutes);
+app.use('/api/v1/address', addressRoutes);
 
 app.all('*', (req, res ,next) => {
     next(new ApiError(`This Route (${req.originalUrl}) is not found`, 400))
