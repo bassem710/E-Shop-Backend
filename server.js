@@ -9,15 +9,7 @@ const dbConnection = require('./config/db');
 const ApiError = require('./utils/ApiError');
 const globalError = require('./middlewares/errorMiddleware');
 
-const categoryRoutes = require('./routes/categoryRoutes');
-const subCategoryRoutes = require('./routes/subCategoryRoutes');
-const brandRoutes = require('./routes/brandRoutes');
-const productRoutes = require('./routes/productRoutes');
-const userRoutes = require('./routes/userRoutes');
-const authRoutes = require('./routes/authRoutes');
-const reviewRoutes = require('./routes/reviewRoutes');
-const wishlistRoutes = require('./routes/wishlistRoutes');
-const addressRoutes = require('./routes/addressRoutes');
+const mountRoutes = require('./routes');
 
 const PORT = process.env.PORT || 8000
 dotenv.config();
@@ -38,15 +30,7 @@ if(process.env.NODE_ENV === "development"){
 }
 
 // Routes
-app.use('/api/v1/category', categoryRoutes);
-app.use('/api/v1/subCategory', subCategoryRoutes);
-app.use('/api/v1/brand', brandRoutes);
-app.use('/api/v1/product', productRoutes);
-app.use('/api/v1/user', userRoutes);
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/review', reviewRoutes);
-app.use('/api/v1/wishlist', wishlistRoutes);
-app.use('/api/v1/address', addressRoutes);
+mountRoutes(app);
 
 app.all('*', (req, res ,next) => {
     next(new ApiError(`This Route (${req.originalUrl}) is not found`, 400))
