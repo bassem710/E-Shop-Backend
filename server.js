@@ -3,6 +3,8 @@ const path = require('path');
 const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
+const cors = require('cors');
+const compression = require('compression');
 require('colors');
 
 const dbConnection = require('./config/db');
@@ -19,6 +21,13 @@ dbConnection();
 
 // Exprress App
 const app = express();
+
+// CORS
+app.use(cors());
+app.options("*", cors());
+
+// Compress all responses
+app.use(compression());
 
 // Middlewares
 app.use(express.json());
