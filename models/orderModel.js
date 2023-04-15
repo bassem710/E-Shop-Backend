@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const orderSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.ObjectId,
-        ref: 'user',
+        ref: 'User',
         required: [true, "User is required"]
     },
     cartItems: [
@@ -50,5 +50,11 @@ const orderSchema = new mongoose.Schema({
     },
     deliveredAt: Date,
 }, {timestamps: true});
+
+orderSchema.pre(/^find/, function(next){
+    this.populate({path:'user', select: 'name profileImg email phone'})
+        .populate({path:'cartItems.product', select: 'title brand'});
+    next();
+})
 
 module.exports = mongoose.model("Order", orderSchema);
