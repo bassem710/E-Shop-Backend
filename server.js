@@ -5,16 +5,23 @@ const dotenv = require('dotenv');
 const morgan = require('morgan');
 const cors = require('cors');
 const compression = require('compression');
+const rateLimit = require('express-rate-limit');
+const xss = require('xss-clean');
+const mongoSanitize = require('express-mongo-sanitize');
+
+// const hpp = require('hpp');
 require('colors');
 
 const dbConnection = require('./config/db');
 const ApiError = require('./utils/ApiError');
 const globalError = require('./middlewares/errorMiddleware');
-
 const mountRoutes = require('./routes');
 const { webhookCheckout } = require('./controllers/orderControllers');
 
+// Port number
 const PORT = process.env.PORT || 8000
+
+// ENV
 dotenv.config();
 
 // Connect Databse
@@ -37,13 +44,28 @@ app.post('/webhook-checkout',
 )
 
 // Middlewares
-app.use(express.json());
+app.use(express.json({limit: "25kb"}));
 app.use(express.static(path.join(__dirname, 'uploads')));
 
 if(process.env.NODE_ENV === "development"){
     app.use(morgan('dev'));
     console.log(`Mode: ${process.env.NODE_ENV}`.blue.bold);
 }
+
+// Data sanitization
+app.use(mongoSanitize());
+app.use(xss());
+
+// HPP
+// app.use(hpp({whitelist: ['filter', 'price', 'fields']}));
+
+// Rate Limiter
+const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000,
+	max: 10,
+    message: 'Too many accounts created from this IP, please try again after an hour'
+});
+app.use('/api/v1', limiter);
 
 // Routes
 mountRoutes(app);
