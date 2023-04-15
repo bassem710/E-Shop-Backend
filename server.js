@@ -12,6 +12,7 @@ const ApiError = require('./utils/ApiError');
 const globalError = require('./middlewares/errorMiddleware');
 
 const mountRoutes = require('./routes');
+const { webhookCheckout } = require('./controllers/orderControllers');
 
 const PORT = process.env.PORT || 8000
 dotenv.config();
@@ -28,6 +29,12 @@ app.options("*", cors());
 
 // Compress all responses
 app.use(compression());
+
+// Checkout Webhook
+app.post('/webhook-checkout', 
+    express.raw({ type: 'application/json'}), 
+    webhookCheckout
+)
 
 // Middlewares
 app.use(express.json());
