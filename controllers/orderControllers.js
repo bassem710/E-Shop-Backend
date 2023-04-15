@@ -3,7 +3,7 @@ const asyncHandler = require('express-async-handler');
 const Order = require('../models/orderModel');
 const Cart = require('../models/cartModel');
 const Product = require('../models/productModel');
-// const handlers = require("./handlers");
+const handlers = require("./handlers");
 const ApiError = require('../utils/ApiError');
 
 // @desc    Create cash order
@@ -46,3 +46,19 @@ exports.createCashOrder = asyncHandler(async (req, res, next) => {
         data: order
     })
 });
+
+// @desc    Get logged user orders only 
+exports.filterOrderForLoggedUser = asyncHandler(async (req, res, next) => {
+    if(req.user.role === 'user') req.filterObj = {user: req.user._id};
+    next();
+})
+
+// @desc    Get all orders
+// @route   GET /api/v1/order
+// @access  Private/user-admin-manager
+exports.getOrders = handlers.getAll(Order);
+
+// @desc    Get specific orders
+// @route   GET /api/v1/order/:id
+// @access  Private/user-admin-manager
+exports.getOrder = handlers.getOne(Order);
