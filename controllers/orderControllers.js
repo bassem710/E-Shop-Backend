@@ -47,7 +47,7 @@ exports.createCashOrder = asyncHandler(async (req, res, next) => {
     })
 });
 
-// @desc    Get logged user orders only 
+// @desc    Filter logged user orders only 
 exports.filterOrderForLoggedUser = asyncHandler(async (req, res, next) => {
     if(req.user.role === 'user') req.filterObj = {user: req.user._id};
     next();
@@ -62,3 +62,40 @@ exports.getOrders = handlers.getAll(Order);
 // @route   GET /api/v1/order/:id
 // @access  Private/user-admin-manager
 exports.getOrder = handlers.getOne(Order);
+
+// @desc    Update order paid status
+// @route   PUT /api/v1/order/:id/pay
+// @access  Private/admin-manager
+exports.updateOrderToPaid = asyncHandler( async (req, res, next) => {
+    const order = await Order.findById(req.params.id);
+    if(!order){
+        return next(new ApiError("There is no such order id", 404));
+    }
+    order.isPaid = true;
+    order.paidAt = Date.now();
+
+    const updatedOrder = await order.save();
+
+    res.status(200).json({
+        status: 'success',
+        data: updatedOrder
+    })
+});
+
+// @desc    Update order delivered status
+// @route   PUT /api/v1/order/:id/deliver
+// @access  Private/admin-manager
+exports.updateOrderToDelivered = asyncHandler( async (req, res, next) => {
+    const order = await Order.findById(req.params.id);
+    if(!order){
+        return next(new ApiError("There is no such order id", 404));
+    }
+    order.isDelivered = true;
+
+    const updatedOrder = await order.save();
+
+    res.status(200).json({
+        status: 'success',
+        data: updatedOrder
+    })
+});
