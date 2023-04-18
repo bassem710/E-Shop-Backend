@@ -9,6 +9,19 @@ const User = require("../models/userModel");
 const handlers = require("./handlers");
 const ApiError = require("../utils/ApiError");
 
+// @desc    Update products' quantity and sold quantity
+const updateProductQtyAndSold = async (cart, cartId) => {
+    const bulkOption = cart.items.map((item) => ({
+        updateOne: {
+            filter: { _id: item.product },
+            update: { $inc: { quantity: -item.qty, sold: +item.qty } },
+        },
+    }));
+    await Product.bulkWrite(bulkOption, {});
+    // Clear usercart
+    await Cart.findByIdAndDelete(cartId);
+}
+
 // @desc    Create cash order
 // @route   POST /api/v1/order
 // @access  Private/user
@@ -34,15 +47,7 @@ exports.createCashOrder = asyncHandler(async (req, res, next) => {
     });
     // Update products' quantity and sold quantity
     if (order) {
-        const bulkOption = cart.items.map((item) => ({
-            updateOne: {
-                filter: { _id: item.product },
-                update: { $inc: { quantity: -item.qty, sold: +item.qty } },
-            },
-        }));
-        await Product.bulkWrite(bulkOption, {});
-        // Clear usercart
-        await Cart.findByIdAndDelete(req.params.cartId);
+        updateProductQtyAndSold(cart, req.params.cartId);
     }
     res.status(201).json({
         status: "Success",
@@ -168,18 +173,11 @@ const createCardOrder = async session => {
 
     // Update products' quantity and sold quantity
     if (order) {
-        const bulkOption = cart.items.map((item) => ({
-            updateOne: {
-                filter: { _id: item.product },
-                update: { $inc: { quantity: -item.qty, sold: +item.qty } },
-            },
-        }));
-        await Product.bulkWrite(bulkOption, {});
-        // Clear usercart
-        await Cart.findByIdAndDelete(cartId);
+        updateProductQtyAndSold(cart, cartId);
     }
 }
 
+// @desc    Webhook
 exports.webhookCheckout = asyncHandler(async (req, res, next) => {
     const sig = req.headers["stripe-signature"];
 

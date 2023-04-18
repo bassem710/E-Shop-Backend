@@ -62,7 +62,7 @@ app.use(xss());
 // Rate Limiter
 const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000,
-	max: 10,
+	max: 100,
     message: 'Too many accounts created from this IP, please try again after an hour'
 });
 app.use('/api/v1', limiter);
