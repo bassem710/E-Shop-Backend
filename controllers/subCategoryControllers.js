@@ -7,7 +7,7 @@ const SubCategory = require('../models/subCategoryModel');
 exports.createFilterObj = (req, res, next) => {
     let filter = {};
     if(req.params.categoryId) filter = {category: req.params.categoryId};
-    req.filter = filter;
+    req.filterObj = filter;
     next();
 }
 

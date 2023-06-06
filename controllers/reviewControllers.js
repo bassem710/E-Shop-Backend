@@ -6,7 +6,7 @@ const handlers = require("./handlers");
 exports.createFilterObj = (req, res, next) => {
     let filter = {};
     if(req.params.productId) filter = {product: req.params.productId};
-    req.filter = filter;
+    req.filterObj = filter;
     next();
 }
 
